@@ -1,5 +1,11 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+	ul
+	each metric in textMetrics
+		li= metric.description + "-" + metric.value
+
+script(type='text/javascript').
+	console.log(textMetrics);
+	console.log(varbinds);
+	console.log(porco);
