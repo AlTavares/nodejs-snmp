@@ -17,9 +17,16 @@ block content
 			var icmp = [];
 			var tcp  = [];
 			var snmp = [];
+			var limit = 10;
 
 			setInterval(function() {
 				$.get('/chart?ifNumber=1').done(function(data){
+					if (kbps.length > limit) {
+						kbps.shift();
+						icmp.shift();
+						tcp.shift();
+						snmp.shift();
+					};
 					kbps.push(data.kbps);
 					icmp.push(data.icmp);
 					tcp.push(data.tcp);
@@ -38,12 +45,11 @@ block content
 							x: -20
 						},
 						xAxis: {
-							categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-								'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+							categories: []
 						},
 						yAxis: {
 							title: {
-								text: 'Temperature (°C)'
+								text: ''
 							},
 							plotLines: [{
 								value: 0,
@@ -52,7 +58,7 @@ block content
 							}]
 						},
 						tooltip: {
-							valueSuffix: '°C'
+							valueSuffix: ''
 						},
 						legend: {
 							layout: 'vertical',
