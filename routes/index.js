@@ -137,6 +137,9 @@ router.get('/chart', function(req, res) {
 		});
 });
 
+router.get('/show', function(req, res) {
+	res.render('chart', { title: 'Express'});
+});
 
 
 module.exports = router;
