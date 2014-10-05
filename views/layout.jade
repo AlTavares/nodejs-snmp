@@ -2,6 +2,32 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/skin.css')
+    link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.css')
+    script(src='/bower_components/jquery/dist/jquery.js')
+    script(src='/bower_components/bootstrap/dist/js/bootstrap.js')
   body
-    block content
+    header
+      .box
+        .field
+          input#host(type='text', placeholder='type agent ip...')
+        .field
+          .btn-group.btn-toggle(data-toggle='buttons')
+            label.btn.btn-primary(active)
+              input(type='radio', name='options', value='public')
+              | public
+            label.btn.btn-primary.btn-default(active)
+              input(type='radio', name='options', value='private')
+              | private
+        .field.last
+          button#confirm.btn-default(type='button') ok
+    section
+      nav
+        ul.nav.nav-pills
+          li.active
+            a Dados gerais
+          li
+            a Gráficos
+      article
+        block content
+    footer
