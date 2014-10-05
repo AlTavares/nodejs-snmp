@@ -39,12 +39,3 @@ Desktop.ini
 desktop.ini
 .vagrant
 .bin
-node_modules/.bin/jade
-node_modules/.bin/jade
-node_modules/.bin/jade
-node_modules/.bin/jade
-node_modules/.bin/stylus
-node_modules/jade/node_modules/.bin/mkdirp
-node_modules/jade/node_modules/constantinople/node_modules/.bin/uglifyjs
-node_modules/jade/node_modules/transformers/node_modules/.bin/uglifyjs
-node_modules/jade/node_modules/with/node_modules/.bin/uglifyjs
