@@ -1,6 +1,13 @@
 extends layout
 block content
-  .basic-info
+	nav
+		ul.nav.nav-pills#tabs(data-tabs='tabs')
+			li.active
+				a(href='#info', data-toggle='tab') Dados gerais
+			li
+				a(href='#chart', data-toggle='tab') Gráficos
+	article.tab-content
+		.basic-info.tab-pane.active#info
 
     script(type="text/javascript").
       setInterval(function() {
@@ -17,10 +24,6 @@ block content
               basicInfo += "<div class='col-sm-6 col-md-4'><div class='thumbnail' style='background:"+new_light_color+"'><div class='caption'><h3 class='center'>"+el['name']+"</h3><h6 class='center'>"+el['oid']+"</h6><p>"+el['description']+"</p><h3><strong>"+el['value']+"</strong></h3></div></div></div>";
           });
 
-          $(".basic-info").html(basicInfo);
-        });
-      }, 2000);
-
       function csToTime(duration) {
         var   seconds = parseInt((duration/100)%60)
             , minutes = parseInt((duration/(100*60))%60)
@@ -34,3 +37,9 @@ block content
       }
 
   .charts
+				$(".basic-info").html(basicInfo);
+					});
+				}, 1500);
+
+		.charts.tab-pane#chart
+			include partials/chart.jade
