@@ -1,0 +1,31 @@
+script(type="text/javascript").
+			setInterval(function() {
+				var basicInfo = "";
+				$.get('/metrics').done(function(data){
+						//conversions
+						data.sysUpTime.value = csToTime(data.sysUpTime.value);
+						data.hrMemorySize.value = parseInt(data.hrMemorySize.value / 1024) + "MB";
+						$.each(data, function(i, el){
+							var new_light_color = 'rgb(' + (Math.floor((256-229)*Math.random()) + 230) + ',' + 
+								(Math.floor((256-229)*Math.random()) + 230) + ',' + 
+								(Math.floor((256-229)*Math.random()) + 230)
+								
+								basicInfo += "<div class='col-sm-6 col-md-4'><div class='thumbnail' style='background:"+new_light_color+"'><div class='caption'><h3 class='center'>"+el['name']+"</h3><h6 class='center'>"+el['oid']+"</h6><p>"+el['description']+"</p><h3><strong>"+el['value']+"</strong></h3></div></div></div>";
+							});
+
+						function csToTime(duration) {
+							var   seconds = parseInt((duration/100)%60)
+							, minutes = parseInt((duration/(100*60))%60)
+							, hours = parseInt((duration/(100*60*60))%24);
+
+							hours = (hours < 10) ? "0" + hours : hours;
+							minutes = (minutes < 10) ? "0" + minutes : minutes;
+							seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+							return hours + ":" + minutes + ":" + seconds;
+						}
+
+						$(".basic-info").html(basicInfo);
+
+					});
+			}, 1500);
