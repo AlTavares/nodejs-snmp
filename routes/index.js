@@ -1,13 +1,22 @@
 var express = require('express');
 var snmp = require ("net-snmp");
 var router = express.Router();
-var session = snmp.createSession ("localhost", "public", {version: snmp.Version1});
+
+var session;
+
+function createSnmpSession(ipAddress, community){
+	session = snmp.createSession (ipAddress, community, {version: snmp.Version1});
+}
 
 /* GET home page. */
 router.get('/', function(req, res) {
+	createSnmpSession("127.0.0.1","public");
  	res.render('index', { title: 'Express'});
 });
 
+router.get('/create_session', function(req, res) {
+	createSnmpSession(req.query.ip, req.query.community);
+});
 
 // GET metrics
 router.get('/metrics', function(req, res) {
@@ -20,20 +29,26 @@ router.get('/metrics', function(req, res) {
 							, value: ""};
 	var ifNumber = {name: "ifNumber", oid: "1.3.6.1.2.1.2.1.0", description: "The number of network interfaces present on this system.", value: ""};
 
-	var textMetrics = [sysDescr,sysUpTime,hrSystemProcesses,hrMemorySize, ifNumber];
+	var textMetrics = {sysDescr : sysDescr,
+					   sysUpTime : sysUpTime,
+					   hrSystemProcesses : hrSystemProcesses,
+					   hrMemorySize : hrMemorySize,
+					   ifNumber : ifNumber
+					   };
 	var oids = [];
+	var keys = [];
 
 	//make oids array
-	for (var i = 0; i < textMetrics.length; i++) {
-		oids[i] = textMetrics[i].oid;
+	for (var metric in textMetrics) {
+		keys.push(metric);
+		oids.push(textMetrics[metric].oid);
 	};
-
 		session.get (oids, function (error, varbinds) {
 		    if (error) {
 		        console.error (error.toString ());
 		    } else {
 		    	for (var i = 0; i < varbinds.length; i++) {
-		    		textMetrics[i].value = varbinds[i].value.toString();
+		    		textMetrics[keys[i]].value = varbinds[i].value.toString();
 		    	};
 		        //res.render('index', { textMetrics: textMetrics, varbinds: varbinds });
 		        res.json(textMetrics);
