@@ -48,49 +48,93 @@ router.get('/chart', function(req, res) {
 
 	var ifNumber = req.query.ifNumber;
 
-	var ifDescr = {name: "ifDescr", oid: "1.3.6.1.2.1.2.2.1.2." + ifNumber, description: "Interface Name", value: ""};
+	var ifDescr = {oid: "1.3.6.1.2.1.2.2.1.2." + ifNumber, description: "Interface Name", value: ""};
 
 	// taxa de Kbytes enviados e recebidos por segundo
-	var ifInOctets = {name: "ifInOctets", oid: "1.3.6.1.2.1.2.2.1.10." + ifNumber, description: "The total number of octets received on the interface,including framing characters."
-							, value: ""};
-	var ifOutOctets = {name: "ifOutOctets", oid: "1.3.6.1.2.1.2.2.1.16." + ifNumber, description: "The total number of octets sent on the interface,including framing characters."
-							, value: ""};
+	var ifInOctets = {oid: "1.3.6.1.2.1.2.2.1.10." + ifNumber, description: "The total number of octets received on the interface,including framing characters."
+						, value: ""};
+	var ifOutOctets = {oid: "1.3.6.1.2.1.2.2.1.16." + ifNumber, description: "The total number of octets sent on the interface,including framing characters."
+						, value: ""};
 
 	// pacotes ICMP Echo Requests recebidos por segundo
-	var icmpInEchosReps = {name: "icmpInEchosReps", oid: "1.3.6.1.2.1.5.9.0", description: "The number of ICMP Echo Reply messages received."
-							, value: ""};
+	var icmpInEchosReps = {oid: "1.3.6.1.2.1.5.9.0", description: "The number of ICMP Echo Reply messages received."
+						, value: ""};
 
 	// taxa de segmentos TCP enviados e recebidos por segundo
-	var tcpInSegs = {name: "tcpInSegs", oid: "1.3.6.1.2.1.6.10.0", description: "The total number of segments received, including those received in error"
+	var tcpInSegs = {oid: "1.3.6.1.2.1.6.10.0", description: "The total number of segments received, including those received in error"
 							, value: ""};
-	var tcpOutSegs = {name: "tcpOutSegs", oid: "1.3.6.1.2.1.6.11.0", description: "The total number of segments sent, including those on current connections but excluding those containing only retransmitted octets."
-							, value: ""};
+	var tcpOutSegs = {oid: "1.3.6.1.2.1.6.11.0", description: "The total number of segments sent, including those on current connections but excluding those containing only retransmitted octets."
+						, value: ""};
 
 	// quantidade de pacotes SNMP recebidos por segundo
-	var snmpInPkts = {name: "snmpInPkts", oid: "1.3.6.1.2.1.11.1.0", description: "The total number of messages delivered to the SNMP entity from the transport service."
-							, value: ""};
+	var snmpInPkts = {oid: "1.3.6.1.2.1.11.1.0", description: "The total number of messages delivered to the SNMP entity from the transport service."
+						, value: ""};
 
-	var chartMetrics = [ifDescr,ifInOctets,ifOutOctets,icmpInEchosReps,tcpInSegs, tcpOutSegs,snmpInPkts];
+	var chartMetrics = {ifDescr	: 	ifDescr,
+						ifInOctets : ifInOctets,
+						ifOutOctets : ifOutOctets,
+						icmpInEchosReps : icmpInEchosReps,
+						tcpInSegs : tcpInSegs,
+						tcpOutSegs : tcpOutSegs,
+	 					snmpInPkts : snmpInPkts};
 	var oids = [];
+	var keys = [];
 
 	//make oids array
-	for (var i = 0; i < chartMetrics.length; i++) {
-		oids[i] = chartMetrics[i].oid;
+	for (var metric in chartMetrics) {
+		keys.push(metric);
+		oids.push(chartMetrics[metric].oid);
 	};
-	console.log(oids);
 
+	var rateX;
+	var icmpX;
+	var tcpX ;
+	var snmpX;
+	var ms = new Date().getTime();
+		console.log(new Date().getTime());
 		session.get (oids, function (error, varbinds) {
 		    if (error) {
 		        console.error (error.toString ());
 		    } else {
 		    	for (var i = 0; i < varbinds.length; i++) {
-		    		chartMetrics[i].value = varbinds[i].value.toString();
+		    		chartMetrics[keys[i]].value = varbinds[i].value.toString();
 		    	};
-		        //res.render('index', { chartMetrics: chartMetrics, varbinds: varbinds });
-		        res.json(chartMetrics);
-		    }
-		});
+				rateX = ifInOctets.value - ifOutOctets.value;
+				icmpX = icmpInEchosReps.value;
+				tcpX  = tcpInSegs.value - tcpOutSegs.value;
+				snmpX = snmpInPkts.value;
+				
+			}
 
+			setTimeout(function() {
+				session.get (oids, function (error, varbinds) {
+				    if (error) {
+				        console.error (error.toString ());
+				    } else {
+				    	for (var i = 0; i < varbinds.length; i++) {
+				    		chartMetrics[keys[i]].value = varbinds[i].value.toString();
+				    	};
+
+						console.log(new Date().getTime());
+						// Chart functions
+						// taxa de Kbytes enviados e recebidos por segundo
+						var kbps = rateX + (ifInOctets.value - ifOutOctets.value);
+						var icmp = icmpX - icmpInEchosReps.value;
+						var tcp  = tcpX  + (tcpInSegs.value - tcpOutSegs.value);
+						var snmp = snmpX - snmpInPkts.value;
+						ms = new Date().getTime() - ms;
+
+						chartMetrics["kbps"] = kbps;
+						chartMetrics["icmp"] = icmp;
+						chartMetrics["tcp"] = tcp;
+						chartMetrics["snmp"] = snmp;
+						chartMetrics["ms"] = ms;
+
+						res.status(200).json(chartMetrics);
+			    	}
+				});
+			}, 1000);
+		});
 });
 
 
