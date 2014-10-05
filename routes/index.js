@@ -45,7 +45,7 @@ router.get('/metrics', function(req, res) {
 
 // GET chart data
 router.get('/chart', function(req, res) {
-
+	
 	var ifNumber = req.query.ifNumber;
 
 	var ifDescr = {name: "ifDescr", oid: "1.3.6.1.2.1.2.2.1.2." + ifNumber, description: "Interface Name", value: ""};
