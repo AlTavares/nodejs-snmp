@@ -1,0 +1,77 @@
+.chart
+	script(type='text/javascript' src='http://code.highcharts.com/modules/exporting.js')
+	script(type='text/javascript' src='http://code.highcharts.com/highcharts.js')
+
+	script(type='text/javascript').
+		/*
+		kbps: 0,
+		icmp: 0,
+		tcp: 10720,
+		snmp: -1,
+		*/
+
+		var kbps = [];
+		var icmp = [];
+		var tcp  = [];
+		var snmp = [];
+
+		setInterval(function() {
+			$.get('/chart?ifNumber=1').done(function(data){
+				kbps.push(data.kbps);
+				icmp.push(data.icmp);
+				tcp.push(data.tcp);
+				snmp.push(data.snmp);
+			});
+		
+		
+			$(function () {
+				$('#container').highcharts({
+					title: {
+						text: 'Monthly Average Temperature',
+						x: -20 //center
+					},
+					subtitle: {
+						text: 'Source: WorldClimate.com',
+						x: -20
+					},
+					xAxis: {
+						categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+							'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+					},
+					yAxis: {
+						title: {
+							text: 'Temperature (°C)'
+						},
+						plotLines: [{
+							value: 0,
+							width: 1,
+							color: '#808080'
+						}]
+					},
+					tooltip: {
+						valueSuffix: '°C'
+					},
+					legend: {
+						layout: 'vertical',
+						align: 'right',
+						verticalAlign: 'middle',
+						borderWidth: 0
+					},
+					series: [{
+						name: 'kbps',
+						data: kbps
+					}, {
+						name: 'icmp',
+						data: icmp
+					}, {
+						name: 'tcp',
+						data: tcp
+					}, {
+						name: 'snmp',
+						data: snmp
+					}]
+				});
+			});
+		}, 1000);
+
+	#container(style="min-width: 310px; height: 400px; margin: 0 auto")
