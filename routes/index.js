@@ -1,6 +1,7 @@
 var express = require('express');
 var snmp = require ("net-snmp");
 var router = express.Router();
+var porco;
 
 var session;
 
