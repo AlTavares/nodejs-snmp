@@ -40,20 +40,21 @@ script(type='text/javascript').
 
 								// set up the updating of the chart each second
 
-								var kbps = this.series[0];
-								var icmp = this.series[1];
-								var tcp  = this.series[2];
-								var snmp = this.series[3];
-								setInterval(function () {
-									$.getJSON('/chart?ifNumber=1',    function (data) {
-										var time = new Date();
-										kbps.addPoint([time.getTime(), data.kbps]);
-										icmp.addPoint([time.getTime(), data.icmp]);
-										tcp.addPoint([time.getTime(),  data.tcp]);
-										snmp.addPoint([time.getTime(), data.snmp]);
-									});
-								}, 1000);
-							}
+									var kbps = this.series[0];
+									var icmp = this.series[1];
+									var tcp  = this.series[2];
+									var snmp = this.series[3];
+									setInterval(function () {
+										$.getJSON('/chart?ifNumber=1',    function (data) {
+											var time = new Date();
+											$("#ifDescr").html(data.ifDescr.value);
+											kbps.addPoint([time.getTime(), data.kbps]);
+											icmp.addPoint([time.getTime(), data.icmp]);
+											tcp.addPoint([time.getTime(),  data.tcp]);
+											snmp.addPoint([time.getTime(), data.snmp]);
+										});
+									}, 1000);
+								}
 						}
 					},
 					rangeSelector: {
