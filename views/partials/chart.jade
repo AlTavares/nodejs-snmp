@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 script(type='text/javascript' src='http://code.highcharts.com/stock/highstock.js')
 script(type='text/javascript' src='http://code.highcharts.com/stock/modules/exporting.js')
 
@@ -94,3 +95,90 @@ nav
 		.field
 			select#iface
 #container(style="min-width: 900px; height: 400px; margin: 0 auto")
+=======
+.chart
+	script(type='text/javascript' src='http://code.highcharts.com/stock/highstock.js')
+	script(type='text/javascript' src='http://code.highcharts.com/stock/modules/exporting.js')
+	#container(style="height: 400px; min-width: 900px")
+
+	script(type='text/javascript').
+		$(function () { 
+			var seriesOptions = [],
+				seriesCounter = 0;
+
+				seriesOptions[0] = {
+					name: "KBPS",
+					data: []
+				};
+				seriesOptions[1] = {
+					name: "ICMP",
+					data: []
+				};
+				seriesOptions[2] = {
+					name: "TCP",
+					data: []
+				};
+				seriesOptions[3] = {
+					name: "SNMP",
+					data: []
+				};	
+
+
+					var ch = new Highcharts.StockChart({
+
+						chart: {
+							renderTo: 'container',
+
+							events: {
+								load: function () {
+
+									// set up the updating of the chart each second
+
+									var kbps = this.series[0];
+									var icmp = this.series[1];
+									var tcp  = this.series[2];
+									var snmp = this.series[3];
+									setInterval(function () {
+										$.getJSON('/chart?ifNumber=1',    function (data) {
+											var time = new Date();
+											kbps.addPoint([time.getTime(), data.kbps]);
+											icmp.addPoint([time.getTime(), data.icmp]);
+											tcp.addPoint([time.getTime(),  data.tcp]);
+											snmp.addPoint([time.getTime(), data.snmp]);
+										});
+									}, 1000);
+								}
+							}
+						},
+						rangeSelector: {
+							selected: 4
+						},
+
+						yAxis: {
+							labels: {
+								formatter: function () {
+									return (this.value > 0 ? ' + ' : '') + this.value + '%';
+								}
+							},
+							plotLines: [{
+								value: 0,
+								width: 2,
+								color: 'silver'
+							}]
+						},
+
+						plotOptions: {
+							series: {
+								compare: 'percent'
+							}
+						},
+
+						tooltip: {
+							pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
+							valueDecimals: 2
+						},
+
+						series: seriesOptions
+					});
+		});
+>>>>>>> 4600a4ca3a174db73f87788288e8e8ff046767b1

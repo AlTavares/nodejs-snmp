@@ -46,7 +46,7 @@ script(type="text/javascript").
 	function csToTime(duration) {
 			var   seconds = parseInt((duration/100)%60)
 			, minutes = parseInt((duration/(100*60))%60)
-			, hours = parseInt((duration/(100*60*60))%24);
+			, hours = parseInt((duration/(100*60*60))%60);
 
 			hours = (hours < 10) ? "0" + hours : hours;
 			minutes = (minutes < 10) ? "0" + minutes : minutes;
