@@ -21,7 +21,13 @@ header .box .field {
   margin: 0px 10px;
 }
 header .box .field #host {
-  width: 350px;
+  width: 340px;
+  font-size: 40px;
+  border: 1px solid #2ec0e2;
+  padding: 0px 10px;
+}
+header .box .field #interval {
+  width: 160px;
   font-size: 40px;
   border: 1px solid #2ec0e2;
   padding: 0px 10px;

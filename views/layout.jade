@@ -9,11 +9,20 @@ html
 		script(type="text/javascript").
 			$(document).ready(function(){
 
+				$('#interval').keyup(function(e)
+				{
+					if(/\D/g.test(this.value))
+					{
+						this.value = this.value.replace(/\D/g, '');
+					}
+				});
 				$('#confirm').click(function(){
 					$.ajax({
 						url: '/create_session?ip='+$('#host').val()+'&community='+$("#community label.active").text(),
 						type: 'GET',
 						success: function(data){ 
+							
+
 							$("body").append('<div class="alert alert-success" role="alert">'+
 								'<button class="close" data-dismiss="alert">'+
 								'	<span aria-hidden="true">&times;</span>'+
@@ -22,6 +31,8 @@ html
 							'</div>');
 						},
 						error: function(data) {
+							
+
 							$("body").append('<div class="alert alert-success" role="alert">'+
 								'<button class="close" data-dismiss="alert">'+
 								'	<span aria-hidden="true">&times;</span>'+
@@ -37,6 +48,9 @@ html
 				.box
 					.field
 						input#host(type='text', placeholder='type agent ip...')
+
+					.field
+						input#interval(type='text', placeholder='interval', value='1500', lastInterval='1500')
 
 					.field
 						.btn-group.btn-toggle#community(data-toggle='buttons')
