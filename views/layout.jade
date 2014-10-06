@@ -11,7 +11,7 @@ html
 
 				$('#confirm').click(function(){
 					$.ajax({
-						url: '/create_sesion?ip='+$('#host').val()+'&community='+$("#community label.active").text(),
+						url: '/create_session?ip='+$('#host').val()+'&community='+$("#community label.active").text(),
 						type: 'GET',
 						success: function(data){ 
 							$("body").append('<div class="alert alert-success" role="alert">'+

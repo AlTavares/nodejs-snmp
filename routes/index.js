@@ -1,22 +1,26 @@
 var express = require('express');
 var snmp = require ("net-snmp");
 var router = express.Router();
-var porco;
 
 var session;
+createSnmpSession("127.0.0.1","public");
 
 function createSnmpSession(ipAddress, community){
+	if (session != undefined)
+		session.close();
+	if (ipAddress == "")
+		ipAddress = "127.0.0.1";
 	session = snmp.createSession (ipAddress, community, {version: snmp.Version1});
 }
 
 /* GET home page. */
 router.get('/', function(req, res) {
-	createSnmpSession("127.0.0.1","public");
  	res.render('index', { title: 'Express'});
 });
 
 router.get('/create_session', function(req, res) {
 	createSnmpSession(req.query.ip, req.query.community);
+	res.status(200);
 });
 
 // GET metrics
@@ -46,13 +50,14 @@ router.get('/metrics', function(req, res) {
 	};
 		session.get (oids, function (error, varbinds) {
 		    if (error) {
-		        console.error (error.toString ());
+		        res.status(200).json({error : error});
+		        return;
 		    } else {
 		    	for (var i = 0; i < varbinds.length; i++) {
 		    		textMetrics[keys[i]].value = varbinds[i].value.toString();
 		    	};
 		        //res.render('index', { textMetrics: textMetrics, varbinds: varbinds });
-		        res.json(textMetrics);
+		        res.status(200).json(textMetrics);
 		    }
 		});
 
@@ -107,10 +112,10 @@ router.get('/chart', function(req, res) {
 	var tcpX ;
 	var snmpX;
 	var ms = new Date().getTime();
-		console.log(new Date().getTime());
 		session.get (oids, function (error, varbinds) {
 		    if (error) {
-		        console.error (error.toString ());
+		        res.status(200).json({error : error});
+		        return;
 		    } else {
 		    	for (var i = 0; i < varbinds.length; i++) {
 		    		chartMetrics[keys[i]].value = varbinds[i].value.toString();
@@ -125,18 +130,21 @@ router.get('/chart', function(req, res) {
 			setTimeout(function() {
 				session.get (oids, function (error, varbinds) {
 				    if (error) {
-				        console.error (error.toString ());
+				        res.status(200).json({error : error});
+				        return;
 				    } else {
 				    	for (var i = 0; i < varbinds.length; i++) {
 				    		chartMetrics[keys[i]].value = varbinds[i].value.toString();
 				    	};
 
-						console.log(new Date().getTime());
 						// Chart functions
 						// taxa de Kbytes enviados e recebidos por segundo
 						var kbps = rateX + (ifInOctets.value - ifOutOctets.value);
+						//pacotes ICMP Echo Requests recebidos por segundo
 						var icmp = icmpX - icmpInEchosReps.value;
+						//taxa de segmentos TCP enviados e recebidos por segundo
 						var tcp  = tcpX  + (tcpInSegs.value - tcpOutSegs.value);
+						//quantidade de pacotes SNMP recebidos por segundo
 						var snmp = snmpX - snmpInPkts.value;
 						ms = new Date().getTime() - ms;
 
