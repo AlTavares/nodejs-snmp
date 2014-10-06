@@ -20,44 +20,12 @@ nav
 #container(style="min-width: 900px; height: 400px; margin: 0 auto")
 script(type='text/javascript' src='http://code.highcharts.com/stock/highstock.js')
 script(type='text/javascript' src='http://code.highcharts.com/stock/modules/exporting.js')
-
 h1#ifDescr(style="text-align:center")
+
 #container(style="height: 400px; min-width: 900px")
 
 script(type='text/javascript').
 	$(function () { 
-		
-		//populate ifaces options
-		$.get('/metrics', function(data){
-			for(var i=1 ; i <= data.ifNumber.value; i++)
-			{
-				$('#iface').append('<option value='+i+'>iface '+i+'</option>');
-			}
-		});
-
-		$('#type-min').keyup(function(e)
-		{
-			if(/\D/g.test(this.value))
-			{
-				this.value = this.value.replace(/\D/g, '');
-			}
-		});
-
-		$('#type-max').keyup(function(e)
-		{
-			if(/\D/g.test(this.value))
-			{
-				this.value = this.value.replace(/\D/g, '');
-			}
-		});
-
-		var monitor = function(type){
-			if($('#type-min').val() > type || $('#type-max').val() < type)
-			{
-				alert('Its a trap');
-			}
-		};
-
 		var seriesOptions = [],
 			oldIndex = 0;
 
@@ -96,9 +64,6 @@ script(type='text/javascript').
 									var icmp = this.series[1];
 									var tcp  = this.series[2];
 									var snmp = this.series[3];
-
-									var monitorAux = 0;
-
 									setInterval(function () {
 										var index = $('#iface').val();
 										$.getJSON('/chart?ifNumber='+ index,    function (data) {
