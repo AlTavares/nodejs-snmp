@@ -1,6 +1,7 @@
 .chart
 	script(type='text/javascript' src='http://code.highcharts.com/stock/highstock.js')
 	script(type='text/javascript' src='http://code.highcharts.com/stock/modules/exporting.js')
+	h1#ifDescr(style="text-align:center")
 	#container(style="height: 400px; min-width: 900px")
 
 	script(type='text/javascript').
@@ -43,6 +44,7 @@
 									setInterval(function () {
 										$.getJSON('/chart?ifNumber=1',    function (data) {
 											var time = new Date();
+											$("#ifDescr").html(data.ifDescr.value);
 											kbps.addPoint([time.getTime(), data.kbps]);
 											icmp.addPoint([time.getTime(), data.icmp]);
 											tcp.addPoint([time.getTime(),  data.tcp]);
