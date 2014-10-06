@@ -46,7 +46,7 @@ script(type='text/javascript').
 									var tcp  = this.series[2];
 									var snmp = this.series[3];
 									setInterval(function () {
-										$.getJSON('/chart?ifNumber=1',    function (data) {
+										$.getJSON('/chart?ifNumber='+$('#iface').val(),    function (data) {
 											var time = new Date();
 											$("#ifDescr").html(data.ifDescr.value);
 											kbps.addPoint([time.getTime(), data.kbps]);
