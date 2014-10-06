@@ -137,15 +137,16 @@ router.get('/chart', function(req, res) {
 				    		chartMetrics[keys[i]].value = varbinds[i].value.toString();
 				    	};
 
+				    	var sec = ms / 1000;
 						// Chart functions
 						// taxa de Kbytes enviados e recebidos por segundo
-						var kbps = rateX + (ifInOctets.value - ifOutOctets.value);
+						var kbps = parseInt((rateX + (ifInOctets.value - ifOutOctets.value)) / sec);
 						//pacotes ICMP Echo Requests recebidos por segundo
-						var icmp = icmpX - icmpInEchosReps.value;
+						var icmp = parseInt((icmpX - icmpInEchosReps.value) / sec);
 						//taxa de segmentos TCP enviados e recebidos por segundo
-						var tcp  = tcpX  + (tcpInSegs.value - tcpOutSegs.value);
+						var tcp  = parseInt((tcpX  + (tcpInSegs.value - tcpOutSegs.value)) / sec);
 						//quantidade de pacotes SNMP recebidos por segundo
-						var snmp = snmpX - snmpInPkts.value;
+						var snmp = parseInt((snmpX - snmpInPkts.value) / sec);
 						ms = new Date().getTime() - ms;
 
 						chartMetrics["kbps"] = kbps;
