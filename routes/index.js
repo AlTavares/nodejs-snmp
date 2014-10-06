@@ -24,36 +24,6 @@ router.get('/create_session', function(req, res) {
 });
 
 // GET metrics
-router.get('/ifaces', function(req, res) {
-
-	var ifaces = [];
-	session.get(["1.3.6.1.2.1.2.2.1"], function (error, varbinds) {
-		console.log(varbinds);
-	  //   if (error) {
-	  //       res.status(200).json({error : error});
-	  //       return;
-	  //   } else {
-	  //   	var oids = [];
-	  //   	for (var i = 1; i <= varbinds[0].value; i++) {
-	  //   		oids.push("1.3.6.1.2.1.2.2.1.2.");
-	  //   	};
-	  //   	var a = 2;
-	  //   	session.get(oids, function (error, varbinds) {
-			//     if (error) {
-			//         res.status(200).json({error : error});
-			//         return;
-			//     } else {
-			//     	ifaces.push({oid: varbinds[1].oid.toString(), value: varbinds[2].value.toString()});
-			//     }
-			// });
-			res.status(200).json(ifaces);
-	  //   }
-
-	});
-
-});
-
-// GET metrics
 router.get('/metrics', function(req, res) {
 
 	var sysDescr = {name: "sysDescr", oid: "1.3.6.1.2.1.1.1.0", description: "System description", value: ""};
@@ -172,11 +142,11 @@ router.get('/chart', function(req, res) {
 						// taxa de Kbytes enviados e recebidos por segundo
 						var kbps = parseInt((rateX + (ifInOctets.value - ifOutOctets.value)) / sec);
 						//pacotes ICMP Echo Requests recebidos por segundo
-						var icmp = parseInt((icmpX - icmpInEchosReps.value) / sec);
+						var icmp = parseInt((icmpInEchosReps.value - icmpX) / sec);
 						//taxa de segmentos TCP enviados e recebidos por segundo
 						var tcp  = parseInt((tcpX  + (tcpInSegs.value - tcpOutSegs.value)) / sec);
 						//quantidade de pacotes SNMP recebidos por segundo
-						var snmp = parseInt((snmpX - snmpInPkts.value) / sec);
+						var snmp = parseInt((snmpInPkts.value - snmpX) / sec);
 						ms = new Date().getTime() - ms;
 
 						chartMetrics["kbps"] = kbps;
