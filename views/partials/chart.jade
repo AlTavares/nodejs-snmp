@@ -1,17 +1,19 @@
-#container(style="min-width: 900px; height: 400px; margin: 0 auto")
+
 script(type='text/javascript' src='http://code.highcharts.com/stock/highstock.js')
 script(type='text/javascript' src='http://code.highcharts.com/stock/modules/exporting.js')
+
 h1#ifDescr(style="text-align:center")
 nav
 	.controllers(style='float: right')
 		.field
-			select#iface
-#container(style="height: 400px; min-width: 900px")
+			select#iface.form-control
+
+#container(style="min-width: 900px; height: 400px; margin: 0 auto")
 
 script(type='text/javascript').
 	$(function () { 
 		var seriesOptions = [],
-			seriesCounter = 0;
+			oldIndex = 0;
 
 			seriesOptions[0] = {
 				name: "KBPS",
@@ -35,6 +37,9 @@ script(type='text/javascript').
 
 					chart: {
 						renderTo: 'container',
+						animation: {
+			                duration: 1500,
+			            },
 
 						events: {
 							load: function () {
@@ -46,13 +51,23 @@ script(type='text/javascript').
 									var tcp  = this.series[2];
 									var snmp = this.series[3];
 									setInterval(function () {
-										$.getJSON('/chart?ifNumber='+$('#iface').val(),    function (data) {
+										var index = $('#iface').val();
+										$.getJSON('/chart?ifNumber='+ index,    function (data) {
 											var time = new Date();
+											console.log(kbps.data[0]);
 											$("#ifDescr").html(data.ifDescr.value);
-											kbps.addPoint([time.getTime(), data.kbps]);
-											icmp.addPoint([time.getTime(), data.icmp]);
-											tcp.addPoint([time.getTime(),  data.tcp]);
-											snmp.addPoint([time.getTime(), data.snmp]);
+											if (oldIndex != index) {
+												kbps.setData([], false);
+												icmp.setData([], false);
+												tcp.setData([], false);
+												snmp.setData([], false);
+
+												oldIndex = index;
+											};
+											kbps.addPoint([time.getTime(), data.kbps],false);
+											icmp.addPoint([time.getTime(), data.icmp],false);
+											tcp.addPoint([time.getTime(),  data.tcp],false);
+											snmp.addPoint([time.getTime(), data.snmp],true); //redraws only in the last point
 										});
 									}, 1000);
 								}
