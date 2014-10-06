@@ -4,20 +4,54 @@
 	#container(style="height: 400px; min-width: 900px")
 
 	script(type='text/javascript').
-
-		$(function () {
-			var kbps = [];
-			var icmp = [];
-			var tcp  = [];
-			var snmp = [];
-
+		$(function () { 
 			var seriesOptions = [],
-				seriesCounter = 0,
-				// create the chart when all data is loaded
-				createChart = function () {
+				seriesCounter = 0;
 
-					$('#container').highcharts('StockChart', {
+				seriesOptions[0] = {
+					name: "KBPS",
+					data: []
+				};
+				seriesOptions[1] = {
+					name: "ICMP",
+					data: []
+				};
+				seriesOptions[2] = {
+					name: "TCP",
+					data: []
+				};
+				seriesOptions[3] = {
+					name: "SNMP",
+					data: []
+				};	
 
+
+					var ch = new Highcharts.StockChart({
+
+						chart: {
+							renderTo: 'container',
+
+							events: {
+								load: function () {
+
+									// set up the updating of the chart each second
+
+									var kbps = this.series[0];
+									var icmp = this.series[1];
+									var tcp  = this.series[2];
+									var snmp = this.series[3];
+									setInterval(function () {
+										$.getJSON('/chart?ifNumber=1',    function (data) {
+											var time = new Date();
+											kbps.addPoint([time.getTime(), data.kbps]);
+											icmp.addPoint([time.getTime(), data.icmp]);
+											tcp.addPoint([time.getTime(),  data.tcp]);
+											snmp.addPoint([time.getTime(), data.snmp]);
+										});
+									}, 1000);
+								}
+							}
+						},
 						rangeSelector: {
 							selected: 4
 						},
@@ -48,37 +82,4 @@
 
 						series: seriesOptions
 					});
-				};
-
-		setInterval(function () {
-
-
-				$.getJSON('/chart?ifNumber=1',    function (data) {
-					var time = new Date();
-					kbps.push([time.getTime(), data.kbps]);
-					icmp.push([time.getTime(), data.icmp]);
-					tcp.push([time.getTime(),  data.tcp ]);
-					snmp.push([time.getTime(), data.snmp]);
-
-					seriesOptions[0] = {
-						name: "KBPS",
-						data: kbps
-					};
-					seriesOptions[1] = {
-						name: "ICMP",
-						data: icmp
-					};
-					seriesOptions[2] = {
-						name: "TCP",
-						data: tcp
-					};
-					seriesOptions[3] = {
-						name: "SNMP",
-						data: snmp
-					};
-
-					createChart();
-					
-				});
-			}, 1000);
 		});
