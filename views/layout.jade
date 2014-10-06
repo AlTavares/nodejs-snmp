@@ -10,9 +10,10 @@ html
 			$(document).ready(function(){
 
 				$.get('/metrics', function(data){
-					$.each(data, function(i, el){
-						$('#iface').append('<option>'+el.name+'</option>');
-					});
+					for(var i=1 ; i <= data.ifNumber.value; i++)
+					{
+						$('#iface').append('<option value='+i+'>iface '+i+'</option>');
+					}
 				});
 
 				$('#iface').change(function(){
