@@ -9,13 +9,6 @@ html
 		script(type="text/javascript").
 			$(document).ready(function(){
 
-				$.get('/metrics', function(data){
-					for(var i=1 ; i <= data.ifNumber.value; i++)
-					{
-						$('#iface').append('<option value='+i+'>iface '+i+'</option>');
-					}
-				});
-
 				$('#interval').keyup(function(e)
 				{
 					if(/\D/g.test(this.value))

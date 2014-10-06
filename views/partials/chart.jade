@@ -1,15 +1,62 @@
+nav
+	.controllers-types(style='float: left')
+		.field
+			input(type='text', placeholder='type min', value='2')#type-min
+
+		.field
+			input(type='text', placeholder='type max', value='4')#type-max
+
+		.field
+			select#types
+				option(value='kbps') KBPS
+				option(value='icmp') ICMP
+				option(value='tcp') TCP
+				option(value='snmp') SNMP
+
+	.controllers-ifaces(style='float: right')
+		.field
+			select#iface
+
 #container(style="min-width: 900px; height: 400px; margin: 0 auto")
 script(type='text/javascript' src='http://code.highcharts.com/stock/highstock.js')
 script(type='text/javascript' src='http://code.highcharts.com/stock/modules/exporting.js')
 h1#ifDescr(style="text-align:center")
-nav
-	.controllers(style='float: right')
-		.field
-			select#iface
 #container(style="height: 400px; min-width: 900px")
 
 script(type='text/javascript').
 	$(function () { 
+		
+		//populate ifaces options
+		$.get('/metrics', function(data){
+			for(var i=1 ; i <= data.ifNumber.value; i++)
+			{
+				$('#iface').append('<option value='+i+'>iface '+i+'</option>');
+			}
+		});
+
+		$('#type-min').keyup(function(e)
+		{
+			if(/\D/g.test(this.value))
+			{
+				this.value = this.value.replace(/\D/g, '');
+			}
+		});
+
+		$('#type-max').keyup(function(e)
+		{
+			if(/\D/g.test(this.value))
+			{
+				this.value = this.value.replace(/\D/g, '');
+			}
+		});
+
+		var monitor = function(type){
+			if($('#type-min').val() > type || $('#type-max').val() < type)
+			{
+				alert('Its a trap');
+			}
+		};
+
 		var seriesOptions = [],
 			seriesCounter = 0;
 
@@ -45,6 +92,9 @@ script(type='text/javascript').
 									var icmp = this.series[1];
 									var tcp  = this.series[2];
 									var snmp = this.series[3];
+
+									var monitorAux = 0;
+
 									setInterval(function () {
 										$.getJSON('/chart?ifNumber='+$('#iface').val(),    function (data) {
 											var time = new Date();
@@ -53,7 +103,22 @@ script(type='text/javascript').
 											icmp.addPoint([time.getTime(), data.icmp]);
 											tcp.addPoint([time.getTime(),  data.tcp]);
 											snmp.addPoint([time.getTime(), data.snmp]);
-										});
+											if(monitorAux % 2 == 0){
+												if($('#types').val() == 'kbps')
+													monitor(data.kbps);
+												
+												else if($('#types').val() == 'icmp')
+													monitor(data.icmp);
+												
+												else if($('#types').val() == 'tcp')
+													monitor(data.tcp);
+												
+												else if($('#types').val() == 'snmp')
+													monitor(data.snmp);
+
+												});
+											}
+											monitorAux ++;
 									}, 1000);
 								}
 						}
