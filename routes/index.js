@@ -24,6 +24,36 @@ router.get('/create_session', function(req, res) {
 });
 
 // GET metrics
+router.get('/ifaces', function(req, res) {
+
+	var ifaces = [];
+	session.get(["1.3.6.1.2.1.2.2.1"], function (error, varbinds) {
+		console.log(varbinds);
+	  //   if (error) {
+	  //       res.status(200).json({error : error});
+	  //       return;
+	  //   } else {
+	  //   	var oids = [];
+	  //   	for (var i = 1; i <= varbinds[0].value; i++) {
+	  //   		oids.push("1.3.6.1.2.1.2.2.1.2.");
+	  //   	};
+	  //   	var a = 2;
+	  //   	session.get(oids, function (error, varbinds) {
+			//     if (error) {
+			//         res.status(200).json({error : error});
+			//         return;
+			//     } else {
+			//     	ifaces.push({oid: varbinds[1].oid.toString(), value: varbinds[2].value.toString()});
+			//     }
+			// });
+			res.status(200).json(ifaces);
+	  //   }
+
+	});
+
+});
+
+// GET metrics
 router.get('/metrics', function(req, res) {
 
 	var sysDescr = {name: "sysDescr", oid: "1.3.6.1.2.1.1.1.0", description: "System description", value: ""};

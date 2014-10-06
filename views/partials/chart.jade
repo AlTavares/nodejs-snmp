@@ -1,184 +1,89 @@
-<<<<<<< HEAD
+#container(style="min-width: 900px; height: 400px; margin: 0 auto")
 script(type='text/javascript' src='http://code.highcharts.com/stock/highstock.js')
 script(type='text/javascript' src='http://code.highcharts.com/stock/modules/exporting.js')
-
-script(type='text/javascript').
-	$(function () {
-
-		$.get('/metrics', function(data){
-			$.each(data, function(i, el){
-				$('#iface').append('<option>'+el.name+'</option>');
-			});
-		});
-
-		$('#iface').change(function(){
-
-		});
-
-		Highcharts.setOptions({
-			global : {
-				useUTC : false
-			}
-		});
-
-		var kbps = [];
-		var icmp = [];
-		var tcp  = [];
-		var snmp = [];
-		var limit = 10;
-
-		// Create the chart
-		$('#container').highcharts('StockChart', {
-			chart : {
-				events : {
-					load : function () {
-						// set up the updating of the chart each second
-						var series = this.series[0];
-						setInterval(function () {
-							var x = (new Date()).getTime(), // current time
-								y = Math.round(Math.random() * 100);
-							series.addPoint([x, y], true, true);
-						}, 1000);
-					}
-				}
-			},
-
-			rangeSelector: {
-				buttons: [{
-					count: 1,
-					type: 'minute',
-					text: '1M'
-				}, {
-					count: 5,
-					type: 'minute',
-					text: '5M'
-				}, {
-					type: 'all',
-					text: 'All'
-				}],
-				inputEnabled: false,
-				selected: 0
-			},
-
-			title : {
-				text : 'Live random data'
-			},
-
-			exporting: {
-				enabled: false
-			},
-
-			series : [{
-				name : 'Random data',
-				data : (function () {
-					// generate an array of random data
-					var data = [], time = (new Date()).getTime(), i;
-
-					for (i = -999; i <= 0; i += 1) {
-						data.push([
-							time + i * 1000,
-							Math.round(Math.random() * 100)
-						]);
-					}
-					return data;
-				}())
-			}]
-		});
-
-	});
-
-
-
-	
 nav
 	.controllers(style='float: right')
 		.field
 			select#iface
-#container(style="min-width: 900px; height: 400px; margin: 0 auto")
-=======
-.chart
-	script(type='text/javascript' src='http://code.highcharts.com/stock/highstock.js')
-	script(type='text/javascript' src='http://code.highcharts.com/stock/modules/exporting.js')
-	#container(style="height: 400px; min-width: 900px")
+#container(style="height: 400px; min-width: 900px")
 
-	script(type='text/javascript').
-		$(function () { 
-			var seriesOptions = [],
-				seriesCounter = 0;
+script(type='text/javascript').
+	$(function () { 
+		var seriesOptions = [],
+			seriesCounter = 0;
 
-				seriesOptions[0] = {
-					name: "KBPS",
-					data: []
-				};
-				seriesOptions[1] = {
-					name: "ICMP",
-					data: []
-				};
-				seriesOptions[2] = {
-					name: "TCP",
-					data: []
-				};
-				seriesOptions[3] = {
-					name: "SNMP",
-					data: []
-				};	
+			seriesOptions[0] = {
+				name: "KBPS",
+				data: []
+			};
+			seriesOptions[1] = {
+				name: "ICMP",
+				data: []
+			};
+			seriesOptions[2] = {
+				name: "TCP",
+				data: []
+			};
+			seriesOptions[3] = {
+				name: "SNMP",
+				data: []
+			};	
 
 
-					var ch = new Highcharts.StockChart({
+				var ch = new Highcharts.StockChart({
 
-						chart: {
-							renderTo: 'container',
+					chart: {
+						renderTo: 'container',
 
-							events: {
-								load: function () {
+						events: {
+							load: function () {
 
-									// set up the updating of the chart each second
+								// set up the updating of the chart each second
 
-									var kbps = this.series[0];
-									var icmp = this.series[1];
-									var tcp  = this.series[2];
-									var snmp = this.series[3];
-									setInterval(function () {
-										$.getJSON('/chart?ifNumber=1',    function (data) {
-											var time = new Date();
-											kbps.addPoint([time.getTime(), data.kbps]);
-											icmp.addPoint([time.getTime(), data.icmp]);
-											tcp.addPoint([time.getTime(),  data.tcp]);
-											snmp.addPoint([time.getTime(), data.snmp]);
-										});
-									}, 1000);
-								}
+								var kbps = this.series[0];
+								var icmp = this.series[1];
+								var tcp  = this.series[2];
+								var snmp = this.series[3];
+								setInterval(function () {
+									$.getJSON('/chart?ifNumber=1',    function (data) {
+										var time = new Date();
+										kbps.addPoint([time.getTime(), data.kbps]);
+										icmp.addPoint([time.getTime(), data.icmp]);
+										tcp.addPoint([time.getTime(),  data.tcp]);
+										snmp.addPoint([time.getTime(), data.snmp]);
+									});
+								}, 1000);
+							}
+						}
+					},
+					rangeSelector: {
+						selected: 4
+					},
+
+					yAxis: {
+						labels: {
+							formatter: function () {
+								return (this.value > 0 ? ' + ' : '') + this.value + '%';
 							}
 						},
-						rangeSelector: {
-							selected: 4
-						},
+						plotLines: [{
+							value: 0,
+							width: 2,
+							color: 'silver'
+						}]
+					},
 
-						yAxis: {
-							labels: {
-								formatter: function () {
-									return (this.value > 0 ? ' + ' : '') + this.value + '%';
-								}
-							},
-							plotLines: [{
-								value: 0,
-								width: 2,
-								color: 'silver'
-							}]
-						},
+					plotOptions: {
+						series: {
+							compare: 'percent'
+						}
+					},
 
-						plotOptions: {
-							series: {
-								compare: 'percent'
-							}
-						},
+					tooltip: {
+						pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
+						valueDecimals: 2
+					},
 
-						tooltip: {
-							pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
-							valueDecimals: 2
-						},
-
-						series: seriesOptions
-					});
-		});
->>>>>>> 4600a4ca3a174db73f87788288e8e8ff046767b1
+					series: seriesOptions
+				});
+	});

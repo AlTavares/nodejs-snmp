@@ -9,6 +9,15 @@ html
 		script(type="text/javascript").
 			$(document).ready(function(){
 
+				$.get('/metrics', function(data){
+					$.each(data, function(i, el){
+						$('#iface').append('<option>'+el.name+'</option>');
+					});
+				});
+
+				$('#iface').change(function(){
+
+				});
 				$('#interval').keyup(function(e)
 				{
 					if(/\D/g.test(this.value))
