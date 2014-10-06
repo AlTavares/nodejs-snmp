@@ -1,83 +1,84 @@
 .chart
-	script(type='text/javascript' src='http://code.highcharts.com/modules/exporting.js')
-	script(type='text/javascript' src='http://code.highcharts.com/highcharts.js')
+	script(type='text/javascript' src='http://code.highcharts.com/stock/highstock.js')
+	script(type='text/javascript' src='http://code.highcharts.com/stock/modules/exporting.js')
+	#container(style="height: 400px; min-width: 900px")
 
 	script(type='text/javascript').
-		/*
-		kbps: 0,
-		icmp: 0,
-		tcp: 10720,
-		snmp: -1,
-		*/
 
-		var kbps = [];
-		var icmp = [];
-		var tcp  = [];
-		var snmp = [];
-		var limit = 10;
+		$(function () {
+			var kbps = [];
+			var icmp = [];
+			var tcp  = [];
+			var snmp = [];
 
-		setInterval(function() {
-			$.get('/chart?ifNumber=1').done(function(data){
-				if (kbps.length > limit) {
-					kbps.shift();
-					icmp.shift();
-					tcp.shift();
-					snmp.shift();
-				};
-				kbps.push(data.kbps);
-				icmp.push(data.icmp);
-				tcp.push(data.tcp);
-				snmp.push(data.snmp);
-			});
-		
-		
-			$(function () {
-				$('#container').highcharts({
-					title: {
-						text: 'Monthly Average Temperature',
-						x: -20 //center
-					},
-					subtitle: {
-						text: 'Source: WorldClimate.com',
-						x: -20
-					},
-					xAxis: {
-						categories: []
-					},
-					yAxis: {
-						title: {
-							text: ''
+			var seriesOptions = [],
+				seriesCounter = 0,
+				// create the chart when all data is loaded
+				createChart = function () {
+
+					$('#container').highcharts('StockChart', {
+
+						rangeSelector: {
+							selected: 4
 						},
-						plotLines: [{
-							value: 0,
-							width: 1,
-							color: '#808080'
-						}]
-					},
-					tooltip: {
-						valueSuffix: ''
-					},
-					legend: {
-						layout: 'vertical',
-						align: 'right',
-						verticalAlign: 'middle',
-						borderWidth: 0
-					},
-					series: [{
-						name: 'kbps',
-						data: kbps
-					}, {
-						name: 'icmp',
-						data: icmp
-					}, {
-						name: 'tcp',
-						data: tcp
-					}, {
-						name: 'snmp',
-						data: snmp
-					}]
-				});
-			});
-		}, 1000);
 
-	#container(style="min-width: 310px; height: 400px; margin: 0 auto")
+						yAxis: {
+							labels: {
+								formatter: function () {
+									return (this.value > 0 ? ' + ' : '') + this.value + '%';
+								}
+							},
+							plotLines: [{
+								value: 0,
+								width: 2,
+								color: 'silver'
+							}]
+						},
+
+						plotOptions: {
+							series: {
+								compare: 'percent'
+							}
+						},
+
+						tooltip: {
+							pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
+							valueDecimals: 2
+						},
+
+						series: seriesOptions
+					});
+				};
+
+		setInterval(function () {
+
+
+				$.getJSON('/chart?ifNumber=1',    function (data) {
+					var time = new Date();
+					kbps.push([time.getTime(), data.kbps]);
+					icmp.push([time.getTime(), data.icmp]);
+					tcp.push([time.getTime(),  data.tcp ]);
+					snmp.push([time.getTime(), data.snmp]);
+
+					seriesOptions[0] = {
+						name: "KBPS",
+						data: kbps
+					};
+					seriesOptions[1] = {
+						name: "ICMP",
+						data: icmp
+					};
+					seriesOptions[2] = {
+						name: "TCP",
+						data: tcp
+					};
+					seriesOptions[3] = {
+						name: "SNMP",
+						data: snmp
+					};
+
+					createChart();
+					
+				});
+			}, 1000);
+		});
