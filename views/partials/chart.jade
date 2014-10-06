@@ -1,10 +1,10 @@
 nav
 	.controllers-types(style='float: left')
 		.field
-			input(type='text', placeholder='type min', value='2')#type-min
+			input(type='text', placeholder='type min', value='0')#type-min
 
 		.field
-			input(type='text', placeholder='type max', value='4')#type-max
+			input(type='text', placeholder='type max', value='10000')#type-max
 
 		.field
 			select#types
@@ -16,16 +16,59 @@ nav
 	.controllers-ifaces(style='float: right')
 		.field
 			select#iface
-
+#alerts(style="width: 600px; margin: 0 auto")
+h1#ifDescr(style="text-align:center")
 #container(style="min-width: 900px; height: 400px; margin: 0 auto")
+
 script(type='text/javascript' src='http://code.highcharts.com/stock/highstock.js')
 script(type='text/javascript' src='http://code.highcharts.com/stock/modules/exporting.js')
-h1#ifDescr(style="text-align:center")
-
-#container(style="height: 400px; min-width: 900px")
 
 script(type='text/javascript').
-	$(function () { 
+	$(function () {
+
+		//populate ifaces options
+		$.get('/metrics', function(data){
+			for(var i=1 ; i <= data.ifNumber.value; i++)
+			{
+				$('#iface').append('<option value='+i+'>iface '+i+'</option>');
+			}
+		});
+
+		$('#type-min').keyup(function(e)
+		{
+			if(/\D/g.test(this.value))
+			{
+				this.value = this.value.replace(/\D/g, '');
+			}
+		});
+
+		$('#type-max').keyup(function(e)
+		{
+			if(/\D/g.test(this.value))
+			{
+				this.value = this.value.replace(/\D/g, '');
+			}
+		});
+
+		var monitor = function(type){
+			var alarm = false;
+			var alert = '<div  id="alarme" class="alert alert-warning alert-dismissible" role="alert" style="width:600px">' +
+				  '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>';
+			if($('#type-min').val() > type){
+				alert += ' <strong>Alerta!</strong> ' + $("#types").val() + ' < ' + $('#type-min').val() + ' </div>';
+				alarm = true;
+			}
+			if($('#type-max').val() < type){
+				alert += '<strong>Alerta!</strong> ' + $("#types").val() + ' > ' + $('#type-max').val() +' </div>';
+				alarm = true;
+			}
+
+			if(document.getElementById("alarme") == null && alarm){
+				$("#alerts").append(alert);
+			}
+		};
+
+
 		var seriesOptions = [],
 			oldIndex = 0;
 
@@ -64,11 +107,11 @@ script(type='text/javascript').
 									var icmp = this.series[1];
 									var tcp  = this.series[2];
 									var snmp = this.series[3];
+									var monitorAux = 1;
 									setInterval(function () {
 										var index = $('#iface').val();
 										$.getJSON('/chart?ifNumber='+ index,    function (data) {
 											var time = new Date();
-											console.log(kbps.data[0]);
 											$("#ifDescr").html(data.ifDescr.value);
 
 											if (oldIndex != index) {
@@ -84,7 +127,7 @@ script(type='text/javascript').
 											tcp.addPoint([time.getTime(),  data.tcp],false);
 											snmp.addPoint([time.getTime(), data.snmp],true); //redraws only in the last point
 
-											if(monitorAux % 2 == 0){
+											if(monitorAux % 5 == 0){
 												if($('#types').val() == 'kbps')
 													monitor(data.kbps);
 												
@@ -97,7 +140,6 @@ script(type='text/javascript').
 												else if($('#types').val() == 'snmp')
 													monitor(data.snmp);
 
-												});
 											}
 											monitorAux ++;
 										});
