@@ -4,7 +4,7 @@ nav
 			input(type='text', placeholder='type min', value='0')#type-min
 
 		.field
-			input(type='text', placeholder='type max', value='10000')#type-max
+			input(type='text', placeholder='type max', value='1000000000')#type-max
 
 		.field
 			select#types
@@ -25,7 +25,7 @@ script(type='text/javascript' src='http://code.highcharts.com/stock/modules/expo
 
 script(type='text/javascript').
 	$(function () {
-
+		var ch;
 		//populate ifaces options
 		$.get('/metrics', function(data){
 			for(var i=1 ; i <= data.ifNumber.value; i++)
@@ -90,7 +90,7 @@ script(type='text/javascript').
 			};	
 
 
-				var ch = new Highcharts.StockChart({
+				ch = new Highcharts.StockChart({
 
 					chart: {
 						renderTo: 'container',
@@ -150,26 +150,14 @@ script(type='text/javascript').
 					rangeSelector: {
 						selected: 4
 					},
-
-					yAxis: {
-						labels: {
-							formatter: function () {
-								return (this.value > 0 ? ' + ' : '') + this.value + '%';
-							}
-						},
-						plotLines: [{
-							value: 0,
-							width: 2,
-							color: 'silver'
-						}]
-					},
-
 					plotOptions: {
-						series: {
-							compare: 'percent'
-						}
+					    series: {
+						compare: 'value'
+					    }
 					},
 
+
+					
 					tooltip: {
 						pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
 						valueDecimals: 2

@@ -63,7 +63,7 @@ module.exports = app;
 
 var debug = require('debug')('nodejs-snmp');
 
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 1234);
 
 var server = app.listen(app.get('port'), function() {
   console.log('Listening on port %d', server.address().port);
